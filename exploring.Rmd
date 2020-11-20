@@ -1,0 +1,233 @@
+---
+title: "exploring"
+author: "NAME"
+date: "DATE"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Load the necessary libraries
+```{r}
+library(tidyverse)
+```
+
+Take a look inside your dataset
+```{r}
+(data<-listings)
+```
+
+### Variation
+
+Perform an analysis of the variation in the "neighbourhood" column. 
+
+```{r}
+data %>%
+  count(neighbourhood) %>%
+  arrange(desc(n))
+
+ggplot(data=listings)+geom_bar(mapping=aes(x=neighbourhood)) +
+  coord_flip()
+```
+
+* Which values are the most common? Why?
+The most common neighborhoods are Donostia-San SebastiÃ¡n and Bilbao. Perhaps these are the largest tourist destinations in the region.
+
+* Which values are rare? Why? Does that match your expectations?
+There are a bunch of different neighborhoods that only have 1 listing. I would expect this because there are probably some very small neighborhoods or places people don't travel in the region. 
+
+* Can you see any unusual patterns? What might explain them?
+There are two places with much higher concentrations than any other place. This is because these are the two cities in the region thus much higher populations and more rooms.
+
+
+Perform an analysis of the variation in the "room_type" column. 
+
+```{r}
+data %>%
+  count(room_type) %>%
+  arrange(desc(n))
+
+ggplot(data=listings)+geom_bar(mapping=aes(x=room_type)) +
+  coord_flip()
+```
+
+* Which values are the most common? Why?
+Entire home/appt and private room is much more common because the spanish people value privacy a lot an want to get away from the city. Also Airbnb is mainly for people to rent their own properties so houses and rooms will be more common just by the nature of the data.
+
+* Which values are rare? Why? Does that match your expectations?
+Shared room and hotel rooms are rare for the aforementioned reasons. This was expected.
+
+* Can you see any unusual patterns? What might explain them?
+Not particularly. Private things>Shared/Public establishments
+
+
+Perform an analysis of the variation in the "price" column. Make sure to explore different "binwidth" values in your analysis.
+
+```{r}
+data %>%
+  count(price) %>%
+  arrange(desc(n))
+
+ggplot(data=listings)+geom_histogram(mapping=aes(x=price),binwidth = 10) +
+  coord_cartesian(xlim = c(0, 500))
+```
+
+* Which values are the most common? Why?
+Values from 50 to 100 seem to be the most common. This is probably the most reasonable/affordable price and thus the optimal price to price an Airbnb.
+
+* Which values are rare? Why? Does that match your expectations?
+Pretty much anything beyond 200 is rare. Yes, that would be very expensive and probably booked less than usual so there are less people pricing it in that range. 
+
+* Can you see any unusual patterns? What might explain them?
+No not particularly, It follows a pretty standard  curve except a little right skewed with a couple spikes. Perhaps these spikes are rooms in the same complex and thus priced exactly the same. 
+
+
+Perform an analysis of the variation in the "minimum_nights" column. Make sure to explore different "binwidth" values in your analysis.
+
+```{r}
+data %>%
+  count(minimum_nights) %>%
+  arrange(desc(n))
+
+ggplot(data=listings)+geom_histogram(mapping=aes(x=minimum_nights),binwidth = 1) +
+  coord_cartesian(xlim = c(0, 10))
+```
+
+* Which values are the most common? Why?
+1-3 is the most common. People probably don't want to set high minimum nights because it could scare away people who want to rent the place.
+
+* Which values are rare? Why? Does that match your expectations?
+Anything over 3. Expected for the aforementioned reasons.
+
+* Can you see any unusual patterns? What might explain them?
+It is very right skewed so that lower values have much higher values. Explained above.
+
+
+Perform an analysis of the variation in the "number_of_reviews" column. Make sure to explore different "binwidth" values in your analysis.
+
+```{r}
+data %>%
+  count(number_of_reviews) %>%
+  arrange(desc(n))
+
+ggplot(data=listings)+geom_histogram(mapping=aes(x=number_of_reviews),binwidth = 1) +
+  coord_cartesian(xlim = c(0, 50))
+```
+
+* Which values are the most common? Why?
+0 is by far the most common value. There's probably lots of places where no one has stayed or people didn't feel like reviewing. 
+* Which values are rare? Why? Does that match your expectations?
+Anything over 10. Expected; same reason as above.
+
+* Can you see any unusual patterns? What might explain them?
+It is very right skewed so that lower values have much higher values. Explained above.
+
+
+Perform an analysis of the variation in the "availability_365" column. Make sure to explore different "binwidth" values in your analysis.
+
+```{r}
+data %>%
+  count(availability_365) %>%
+  arrange(desc(n))
+
+ggplot(data=listings)+geom_histogram(mapping=aes(x=availability_365),binwidth = 1) +
+  coord_cartesian(xlim = c(0, 365))
+```
+
+* Which values are the most common? Why?
+0 and 365. Probably there are mainly places that are inactive (0) and places that are always open (365).
+
+* Which values are rare? Why? Does that match your expectations?
+Pretty much any other random value, There's 363 other options of which it's pretty evenenly spread cause it's probably pretty random.
+
+* Can you see any unusual patterns? What might explain them?
+There are some random spikes. Perhaps these are places that are only open during certain seasons or not open during certain holidays. 
+
+
+
+# Part 2
+
+What seems to be the most common name (of a person) in the city you selected?
+
+```{r}
+data %>%
+  count(host_name) %>%
+  arrange(desc(n))
+```
+
+Well first is FeelFree Rentals but that is probably a company of some sorts. The most common real name is Ana.
+
+Do the number of reviews affect the price of the Airbnb? How? Why do you think this happens?
+
+```{r}
+ggplot(listings,aes(x=number_of_reviews,y=price))+geom_point()+geom_smooth()
+       
+       ggplot(listings,aes(x=number_of_reviews,y=price))+geom_boxplot(aes(group=cut_width(number_of_reviews,10)))+
+         coord_cartesian(xlim=c(0,500),ylim=c(0,500))
+```
+
+There doesn't seem to be a statistically significant relationship between number of reviews and price of an airbnb. It seems to be pretty even except at the higher ranges where the price increases a little but not enough to be significant.I think the number of reviews has less to do with quality and more to do with time available meaning there won't be much relation. In addition, this doesn't take quality of review into account so that lowers significance even more.
+
+What type of room tends to have the highest Airbnb price?
+
+```{r}
+ggplot(listings,aes(x=room_type,y=price))+geom_point()+geom_smooth()
+       
+       ggplot(listings,aes(x=room_type,y=price))+geom_boxplot()+coord_cartesian(ylim=c(0,350))
+```
+
+Entire homes tend to have the highest price followed by hotel room then private room then shared room
+
+What neighborhood(s) tend to have the highest Airbnb price?
+
+```{r}
+   
+  ggplot(listings,aes(x=neighbourhood,y=price))+geom_boxplot(aes(reorder(neighbourhood,price,FUN=median),y=price,group=cut_width(number_of_reviews,10)))+coord_cartesian(ylim=c(0,350))
+
+```
+
+There actually doesn't seem to be any neighborhood that has a significant amount of reviews and is highly priced. The neighborhood with the highest prices seems to be Bilbao.
+
+Suppose you could purchase a property in the city you selected, and that you could rent it to others as an Airbnb. In what neighborhood would you want to purchase your property? Why?
+
+I would purchase in Balboa since there seems to be a lot of highly priced Airbnbs there. Although the average isn't significantly higher, the market is strong (evidenced by the amount of airbnbs there) and there is a lot of potential for profit (high prices).
+
+
+# Part 3
+
+https://www.idealista.com/en/inmueble/91205468/
+Apartment in Bilbao
+Price: 645,000 €
+Address:48009, Bilbo, Bizkaia, at Abando, on floor 5.
+
+```{r}
+listings %>%
+  group_by(neighbourhood) %>%
+  summarize(mean_price=mean(price))%>%
+  arrange(desc(mean_price)) 
+```
+
+Average Price in Bilbao: 256.93
+
+```{r}
+listings %>%
+  group_by(neighbourhood) %>%
+  summarize(mean_availability=mean(availability_365))
+```
+
+Mean Number of Days: 161.17
+
+Profit in A Year: 41,409.4
+
+Time Until Profit: 15.58 Years
+
+
+
+
+
+
+
+
+
